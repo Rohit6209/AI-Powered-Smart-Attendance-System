@@ -1,0 +1,10 @@
+flask
+waitress
+cryptography
+numpy
+opencv-python-headless
+dlib-bin
+face_recognition_models
+Click
+Pillow
+setuptools<81
