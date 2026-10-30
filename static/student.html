@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Attendance</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<section id="loginView" class="login">
+  <div class="login-box">
+    <div class="logo">SA</div>
+    <h1>My attendance</h1>
+    <p class="muted">Sign in with your roll number. First time? Password is your roll number unless your teacher set another.</p>
+    <input id="lr" placeholder="Roll number" autocomplete="username">
+    <input id="lp" type="password" placeholder="Password" autocomplete="current-password">
+    <button id="loginBtn">Sign in</button>
+    <p id="loginErr" class="err"></p>
+    <a href="/admin">Teacher or admin login</a>
+    <p class="credit">Designed &amp; developed by <b>Rohit Kumar Kushwaha</b></p>
+  </div>
+</section>
+
+<section id="appView" hidden>
+  <header>
+    <div class="brand"><span class="logo">SA</span><h2>My attendance</h2></div>
+    <div class="userbox"><span id="who" class="muted"></span> <button id="logoutBtn" class="ghost">Sign out</button></div>
+  </header>
+
+  <main class="pane">
+    <div class="panel">
+      <h3>Overall attendance</h3>
+      <div id="pct" class="stat">-</div>
+      <p id="pctMsg" class="muted"></p>
+      <p id="counts" class="muted"></p>
+    </div>
+
+    <div class="panel">
+      <h3>My details</h3>
+      <dl id="profile" class="info"></dl>
+    </div>
+
+    <div class="wide">
+      <h3>Subject-wise attendance</h3>
+      <div class="scroll"><table id="subTable"></table></div>
+    </div>
+
+    <div class="wide">
+      <h3>My attendance log</h3>
+      <div class="row">
+        <select id="subSel"><option value="">All subjects</option></select>
+        <button id="csvBtn" class="ghost">Download CSV</button>
+      </div>
+      <div class="scroll"><table id="logTable"></table></div>
+    </div>
+
+    <div class="wide">
+      <h3>Change password</h3>
+      <div class="row">
+        <input id="oldPw" type="password" placeholder="Old password">
+        <input id="newPw" type="password" placeholder="New password (6+ characters)">
+        <button id="pwBtn">Update password</button>
+      </div>
+      <p id="pwMsg" class="muted"></p>
+    </div>
+  </main>
+  <footer class="credit">Designed &amp; developed by <b>Rohit Kumar Kushwaha</b></footer>
+</section>
+
+<script src="student.js"></script>
+</body>
+</html>
