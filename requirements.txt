@@ -1,0 +1,7 @@
+flask
+waitress
+cryptography
+numpy
+opencv-python
+face_recognition
+setuptools<81
