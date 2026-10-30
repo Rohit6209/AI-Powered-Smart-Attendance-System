@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gate Attendance</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="gate">
+
+<div class="gate-start" id="startOverlay">
+  <div class="card">
+    <div class="logo">SA</div>
+    <h1>Gate attendance</h1>
+    <p class="muted" id="startMsg">Choose the camera for this screen, then press Start.</p>
+    <select id="srcSel" aria-label="Camera source"><option value="local">This device's camera</option></select>
+    <button id="startBtn" class="block">Start</button>
+    <p id="startErr" class="err"></p>
+    <a href="/admin" id="adminLink" hidden>Sign in as admin / teacher first</a>
+  </div>
+</div>
+
+<div class="gate-shell" id="shell" hidden>
+  <div class="gate-top">
+    <div class="brand"><span class="logo">SA</span><h2 style="margin:0">Gate attendance</h2></div>
+    <div class="clock" id="clock">--:--<small id="date"></small></div>
+    <div class="tools">
+      <span class="count"><span id="todayCount">0</span> in today</span>
+      <button class="ghost" id="swapBtn" hidden>Switch camera</button>
+      <button class="ghost" id="fsBtn">Full screen</button>
+      <a class="btn ghost" href="/admin">Admin</a>
+    </div>
+  </div>
+
+  <div class="gate-main">
+    <section class="stage" id="stage">
+      <video id="vid" autoplay muted playsinline></video>
+      <img class="feed" id="remote" alt="Camera feed" hidden>
+      <canvas id="ov"></canvas>
+      <div class="hint"><span class="chip live" id="chip"><i></i><span id="chipTxt">Ready</span></span></div>
+    </section>
+
+    <aside class="gate-side">
+      <div id="profile" class="profile"></div>
+      <div class="recent">
+        <h3>Recent entries</h3>
+        <ul id="recent" class="list"></ul>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script src="common.js"></script>
+<script src="gate.js"></script>
+</body>
+</html>
