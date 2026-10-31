@@ -8,3 +8,5 @@ face_recognition_models
 Click
 Pillow
 setuptools<81
+pymongo
+dnspython
