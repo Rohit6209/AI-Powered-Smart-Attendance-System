@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Smart Attendance</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<section id="loginView" class="login">
+  <div class="login-box">
+    <div class="logo">SA</div>
+    <h1>Smart Attendance</h1>
+    <p class="muted">Sign in to take attendance, run the gate screen and view reports.</p>
+    <input id="lu" placeholder="Username" autocomplete="username">
+    <input id="lp" type="password" placeholder="Password" autocomplete="current-password">
+    <button id="loginBtn">Sign in</button>
+    <p id="loginErr" class="err"></p>
+    <a href="/">Student login</a>
+    <p class="credit">Designed &amp; developed by <b>Rohit Kumar Kushwaha</b></p>
+  </div>
+</section>
+
+<section id="appView" hidden>
+  <header>
+    <div class="brand"><span class="logo">SA</span><h2>Smart Attendance</h2></div>
+    <nav>
+      <button class="tab active" data-tab="mark">Live scan</button>
+      <button class="tab" data-tab="cams">CCTV &amp; Gate</button>
+      <button class="tab" data-tab="reg">Students</button>
+      <button class="tab" data-tab="rep">Reports</button>
+      <button class="tab" data-tab="leaves">Leaves <span id="leaveBadge" class="count-badge" hidden>0</span></button>
+      <button class="tab" data-tab="settings" id="settingsTab" hidden>Settings</button>
+    </nav>
+    <div class="userbox"><span id="who" class="muted"></span> <button id="logoutBtn" class="ghost">Sign out</button></div>
+  </header>
+
+  <main>
+    <!-- LIVE SCAN (multi-face) -->
+    <div id="mark" class="pane">
+      <div class="stage" id="stageMark">
+        <video id="vidMark" autoplay muted playsinline></video>
+        <canvas id="ovMark"></canvas>
+        <div class="hint"><span class="chip" id="liveChip"><i></i><span id="liveTxt">Camera off</span></span></div>
+      </div>
+      <div class="panel">
+        <label for="subject">Subject / class</label>
+        <input id="subject" placeholder="e.g. Data Structures">
+        <div class="row">
+          <button id="scanBtn">Start scanning</button>
+          <select id="camSel" title="Camera" aria-label="Camera"></select>
+        </div>
+        <p class="muted">Everyone in front of the camera is scanned together. Just look at the camera for a second or two — no need to move or blink. Works in low light too.</p>
+        <div class="stat-row">
+          <div class="mini"><b id="stMarked">0</b><span>Marked now</span></div>
+          <div class="mini"><b id="stFaces">0</b><span>Faces seen</span></div>
+          <div class="mini"><b id="stWait">0</b><span>Verifying</span></div>
+        </div>
+        <div id="result" class="result"></div>
+        <h3 style="margin-top:1rem">Marked this session</h3>
+        <ul id="sessionList" class="list"></ul>
+      </div>
+    </div>
+
+    <!-- CCTV & GATE -->
+    <div id="cams" class="pane" hidden>
+      <div class="panel">
+        <h3>Gate screen</h3>
+        <p class="muted">Put a screen + camera at the entrance and open this page on it. Whoever walks in is marked present and their profile appears on the screen.</p>
+        <a class="btn" href="/gate" target="_blank" rel="noopener">Open gate screen</a>
+      </div>
+      <div class="panel">
+        <h3>Add CCTV / IP camera</h3>
+        <label for="cName">Name</label><input id="cName" placeholder="Classroom 3 CCTV">
+        <label for="cUrl">Camera URL</label><input id="cUrl" placeholder="rtsp://user:pass@192.168.1.20:554/stream1">
+        <div class="row">
+          <select id="cMode" aria-label="Mode"><option value="class">Classroom (subject)</option><option value="gate">Gate (daily entry)</option></select>
+          <input id="cSub" placeholder="Subject (classroom mode)" style="flex:1;min-width:150px">
+        </div>
+        <button id="camAdd" class="block">Add camera</button>
+        <p id="camMsg" class="muted"></p>
+      </div>
+      <div class="wide">
+        <h3>Cameras</h3>
+        <ul id="camList" class="list" style="max-height:none"></ul>
+      </div>
+      <div class="wide" id="camViewBox" hidden>
+        <div class="row"><h3 id="camViewTitle" style="margin:0;flex:1"></h3><button id="camViewClose" class="ghost">Close preview</button></div>
+        <div class="pane">
+          <div class="stage"><img class="feed" id="camFeed" alt="Camera preview"></div>
+          <ul id="camFaces" class="list"></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="reg" class="pane" hidden>
+      <div class="stage"><video id="vidReg" autoplay muted playsinline></video>
+        <div class="hint"><span class="chip" id="regChip" role="button" tabindex="0">Camera off</span></div></div>
+      <div class="panel">
+        <label for="rRoll">Roll number</label><input id="rRoll">
+        <label for="rName">Full name</label><input id="rName">
+        <label for="rEmail">Student email</label><input id="rEmail" type="email">
+        <label for="rParent">Parent email</label><input id="rParent" type="email">
+        <label for="rPass">Student login password</label><input id="rPass" type="password" placeholder="Leave empty to use the roll number">
+        <button id="regBtn" class="block">Capture face and register</button>
+        <p class="muted">Tip: face the light, keep your face centred and look straight at the camera. Capture takes about 1 second.</p>
+        <p id="regMsg" class="muted"></p>
+      </div>
+      <div class="wide">
+        <h3>Registered students</h3>
+        <div class="scroll"><table id="stuTable"></table></div>
+      </div>
+    </div>
+
+    <!-- REPORTS -->
+    <div id="rep" class="pane" hidden>
+      <div class="wide filters">
+        <input type="date" id="fDate">
+        <input id="fSub" placeholder="Subject (optional)">
+        <button id="loadBtn">Show</button>
+        <button id="csvBtn" class="ghost">Download CSV</button>
+        <input id="thr" type="number" value="75" min="1" max="100" class="small" aria-label="Threshold %">
+        <button id="alertBtn" class="ghost">Send low-attendance alerts</button>
+      </div>
+      <p id="alertMsg" class="wide muted"></p>
+      <div class="wide"><h3>Last 7 days</h3><canvas id="chart" width="700" height="220"></canvas></div>
+      <div class="wide">
+        <h3>Day report (present / absent / on leave)</h3>
+        <div class="row"><input type="date" id="dDate"><button id="dayBtn" class="ghost">Show</button><span id="dayCounts" class="muted"></span></div>
+        <div class="scroll"><table id="dayTable"></table></div>
+      </div>
+      <div class="wide"><h3>Attendance percentage</h3><div class="scroll"><table id="sumTable"></table></div></div>
+      <div class="wide"><h3>Attendance log</h3><div class="scroll"><table id="logTable"></table></div></div>
+    </div>
+
+    <!-- LEAVES (teacher / admin approval) -->
+    <div id="leaves" class="pane" hidden>
+      <div class="wide">
+        <div class="row">
+          <h3 style="margin:0;flex:1">Leave requests</h3>
+          <select id="leaveFilter" aria-label="Filter">
+            <option value="pending">Pending</option><option value="approved">Approved</option>
+            <option value="rejected">Rejected</option><option value="">All</option>
+          </select>
+        </div>
+        <ul id="leaveList" class="list" style="max-height:none"></ul>
+      </div>
+    </div>
+
+    <!-- SETTINGS (admin) -->
+    <div id="settings" class="pane" hidden>
+      <div class="wide">
+        <h3>Location lock</h3>
+        <p class="muted">When ON, attendance from phones/computers is accepted only inside the circle you set on the map. Click the map (or drag the pin) to set the centre.</p>
+        <label class="check"><input type="checkbox" id="locOn"> Turn ON location lock</label>
+        <div class="row">
+          <input id="mapQ" placeholder="Search a place or address" style="flex:1;min-width:180px">
+          <button id="mapSearch" class="ghost">Search</button>
+          <button id="mapMe" class="ghost">Use my current location</button>
+        </div>
+        <div id="map"></div>
+        <div class="row" style="margin-top:.75rem">
+          <label for="locRadius" style="margin:0">Allowed radius (metres)</label>
+          <input id="locRadius" type="number" min="20" max="5000" value="150" class="small">
+          <span class="muted" id="locTxt">No location picked yet</span>
+        </div>
+        <p class="muted">Tip: use 100 m or more. Computers without GPS give a rough location. CCTV/IP cameras are fixed at the site, so the lock does not apply to them.</p>
+      </div>
+
+      <div class="panel">
+        <h3>Scanning</h3>
+        <label class="check"><input type="checkbox" id="lowLight"> Low-light boost (brightens dark frames)</label>
+        <label class="check"><input type="checkbox" id="reqMove"> Require head movement (anti-photo check)</label>
+        <label class="check"><input type="checkbox" id="selfMark"> Students can mark attendance from the student app</label>
+        <label class="check"><input type="checkbox" id="locOnly"> If a student's camera does not work, allow marking by location (needs Location lock ON)</label>
+        <label for="tol">Face match strictness</label>
+        <select id="tol">
+          <option value="0.45">Strict (fewest wrong matches)</option>
+          <option value="0.5">Normal</option>
+          <option value="0.56">Relaxed (better in poor light)</option>
+        </select>
+        <p class="muted" style="margin-top:.75rem">With head movement OFF, a student is marked as soon as the same face is recognised in 2 frames.</p>
+        <button id="saveSettings" class="block">Save settings</button>
+        <p id="setMsg" class="muted"></p>
+      </div>
+
+      <div class="panel">
+        <h3>Teachers</h3>
+        <p class="muted">Teachers can scan, register students and approve leaves.</p>
+        <ul id="teacherList" class="list" style="max-height:160px"></ul>
+        <input id="tUser" placeholder="Teacher username" autocomplete="off">
+        <input id="tPass" type="password" placeholder="Password (6+ characters)" autocomplete="new-password">
+        <button id="tAdd" class="block">Add teacher</button>
+        <p id="tMsg" class="muted"></p>
+      </div>
+
+      <div class="panel">
+        <h3>Change my password</h3>
+        <input id="myOld" type="password" placeholder="Old password" autocomplete="current-password">
+        <input id="myNew" type="password" placeholder="New password (6+ characters)" autocomplete="new-password">
+        <button id="myPwBtn" class="block">Update password</button>
+        <p id="myPwMsg" class="muted"></p>
+      </div>
+    </div>
+  </main>
+  <footer class="credit">Designed &amp; developed by <b>Rohit Kumar Kushwaha</b></footer>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="common.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
