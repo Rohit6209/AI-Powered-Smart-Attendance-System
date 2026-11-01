@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Attendance</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<section id="loginView" class="login">
+  <div class="login-box">
+    <div class="logo">SA</div>
+    <h1>My attendance</h1>
+    <p class="muted">Sign in with your roll number. First time? Password is your roll number unless your teacher set another.</p>
+    <input id="lr" placeholder="Roll number" autocomplete="username">
+    <input id="lp" type="password" placeholder="Password" autocomplete="current-password">
+    <button id="loginBtn">Sign in</button>
+    <p id="loginErr" class="err"></p>
+    <a href="/admin">Teacher or admin login</a>
+    <p class="credit">Designed &amp; developed by <b>Rohit Kumar Kushwaha</b></p>
+  </div>
+</section>
+
+<section id="appView" hidden>
+  <header>
+    <div class="brand"><span class="logo">SA</span><h2>My attendance</h2></div>
+    <div class="userbox"><span id="who" class="muted"></span> <button id="logoutBtn" class="ghost">Sign out</button></div>
+  </header>
+
+  <main class="pane">
+    <div class="panel">
+      <h3>Overall attendance</h3>
+      <div id="pct" class="stat">-</div>
+      <p id="pctMsg" class="muted"></p>
+      <p id="counts" class="muted"></p>
+    </div>
+
+    <div class="panel">
+      <h3>My details</h3>
+      <dl id="profile" class="info"></dl>
+    </div>
+
+    <div class="wide">
+      <div class="row">
+        <h3 style="margin:0;flex:1">Day-wise attendance</h3>
+        <button class="ghost" id="mPrev" aria-label="Previous month">&lsaquo;</button>
+        <b id="mTitle" style="min-width:8.5rem;text-align:center"></b>
+        <button class="ghost" id="mNext" aria-label="Next month">&rsaquo;</button>
+      </div>
+      <div class="stat-row" style="grid-template-columns:repeat(4,1fr)">
+        <div class="mini"><b id="dP">0</b><span>Present</span></div>
+        <div class="mini"><b id="dA">0</b><span>Absent</span></div>
+        <div class="mini"><b id="dL">0</b><span>On leave</span></div>
+        <div class="mini"><b id="dPct">-</b><span>Day-wise %</span></div>
+      </div>
+      <div class="cal" id="cal"></div>
+      <div class="legend muted">
+        <span><i class="sw present"></i>Present</span><span><i class="sw absent"></i>Absent</span>
+        <span><i class="sw leave"></i>Leave</span><span><i class="sw pending"></i>Not marked yet</span>
+      </div>
+      <p id="dOverall" class="muted"></p>
+    </div>
+
+    <div class="wide">
+      <h3>Apply for leave</h3>
+      <div class="row">
+        <label for="lFrom" style="margin:0">From</label><input type="date" id="lFrom">
+        <label for="lTo" style="margin:0">To</label><input type="date" id="lTo">
+      </div>
+      <input id="lReason" placeholder="Reason (e.g. fever, family function)" maxlength="500">
+      <button id="lBtn">Send to teacher for approval</button>
+      <p id="lMsg" class="muted"></p>
+      <h3 style="margin-top:1rem">My leave requests</h3>
+      <div class="scroll"><table id="leaveTable"></table></div>
+    </div>
+
+    <div class="wide">
+      <h3>Subject-wise attendance</h3>
+      <div class="scroll"><table id="subTable"></table></div>
+    </div>
+
+    <div class="wide">
+      <h3>My attendance log</h3>
+      <div class="row">
+        <select id="subSel"><option value="">All subjects</option></select>
+        <button id="csvBtn" class="ghost">Download CSV</button>
+      </div>
+      <div class="scroll"><table id="logTable"></table></div>
+    </div>
+
+    <div class="wide">
+      <h3>Change password</h3>
+      <div class="row">
+        <input id="oldPw" type="password" placeholder="Old password">
+        <input id="newPw" type="password" placeholder="New password (6+ characters)">
+        <button id="pwBtn">Update password</button>
+      </div>
+      <p id="pwMsg" class="muted"></p>
+    </div>
+  </main>
+  <footer class="credit">Designed &amp; developed by <b>Rohit Kumar Kushwaha</b></footer>
+</section>
+
+<script src="student.js"></script>
+</body>
+</html>
